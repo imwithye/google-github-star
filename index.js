@@ -61,17 +61,6 @@ var extractRepo = function(urlObject) {
   return { index : urlObject.index, user : null, repo : null };
 };
 
-var assembleAPI = function(urlObject) {
-  if (urlObject.user && urlObject.repo) {
-    return {
-      index : urlObject.index,
-      api :
-        "https://api.github.com/repos/" + urlObject.user + "/" + urlObject.repo
-    };
-  }
-  return { index : urlObject.index, api : null };
-};
-
 var resultUrls = function() {
   return Array.from(document.getElementsByClassName('rc'))
     .map((div, index) => {
@@ -80,25 +69,58 @@ var resultUrls = function() {
       return { index : index, url : url };
     })
     .map(link => extractUrl(link))
-    .map(link => extractRepo(link))
-    .map(link => assembleAPI(link));
+    .map(link => extractRepo(link));
 };
 
 var loadStars = function() {
   var urls = resultUrls();
   urls.forEach(link => {
-    if (!link.api) {
+    if (!link.user || !link.repo) {
       return;
     }
 
-    httpGetAsync(link.api, (responseText) => {
-      var resp = JSON.parse(responseText);
-      var stars = resp.stargazers_count;
-      var forks = resp.forks_count;
-      var div = document.createElement('div');
-      div.innerHTML = "Star: " + stars + ", Fork: " + forks;
-      document.getElementsByClassName('rc')[link.index].appendChild(div);
-      console.log("ok");
-    });
+    var div = document.createElement('div');
+    document.getElementsByClassName('rc')[link.index].appendChild(div);
+
+    var star = document.createElement('a');
+    star.setAttribute('class', 'github-button');
+    star.setAttribute('href',
+                      'https://github.com/' + link.user + '/' + link.repo);
+    star.setAttribute('data-count-href',
+                      '/' + link.user + '/' + link.repo + '/stargazers');
+    star.setAttribute('data-count-api', '/repos/' + link.user + '/' +
+                                          link.repo + '#stargazers_count');
+    star.setAttribute('data-count-aria-label', '# stargazers on GitHub');
+    star.setAttribute('aria-label',
+                      'Star ' + link.user + '/' + link.repo + ' on GitHub');
+    star.innerHTML = 'Star';
+    div.appendChild(star);
+
+    var span = document.createElement('span');
+    span.innerHTML = '&nbsp;&nbsp;'
+    div.appendChild(span);
+
+    var fork = document.createElement('a');
+    fork.setAttribute('class', 'github-button');
+    fork.setAttribute('href', 'https://github.com/' + link.user + '/' +
+                                link.repo + '/fork');
+    fork.setAttribute('data-count-href',
+                      '/' + link.user + '/' + link.repo + '/network');
+    fork.setAttribute('data-count-api',
+                      '/repos/' + link.user + '/' + link.repo + '#forks_count');
+    fork.setAttribute('data-count-aria-label', '# forks on GitHub');
+    fork.setAttribute('aria-label',
+                      'Fork ' + link.user + '/' + link.repo + ' on GitHub');
+    fork.innerHTML = 'Fork';
+    div.appendChild(fork);
   });
 };
+
+var init = function() {
+  var script = document.createElement('script');
+  script.src = 'https://buttons.github.io/buttons.js';
+  script.onload = loadStars();
+  document.head.appendChild(script);
+};
+
+init();
