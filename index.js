@@ -69,16 +69,13 @@ var resultUrls = function() {
       return { index : index, url : url };
     })
     .map(link => extractUrl(link))
-    .map(link => extractRepo(link));
+    .map(link => extractRepo(link))
+    .filter(link => link.user && link.repo);
 };
 
 var loadStars = function() {
   var urls = resultUrls();
   urls.forEach(link => {
-    if (!link.user || !link.repo) {
-      return;
-    }
-
     var div = document.createElement('div');
     document.getElementsByClassName('rc')[link.index].appendChild(div);
 
