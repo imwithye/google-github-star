@@ -1,5 +1,5 @@
 {
-  "name": "chrome-github-star",
+  "name": "google-github-star",
   "version": "1.0.0",
   "description": "Show GitHub Repo Stars in Google Search Result",
   "main": "index.js",
@@ -7,5 +7,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ciel",
-  "license": "ISC"
+  "license": "MIT"
 }
